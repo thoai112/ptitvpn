@@ -9,6 +9,7 @@ const jwt = require("../database/jwt");
 router.post("/addserver", jwt(Role.Admin), addserver);
 router.get("/getserver",jwt(), getserver);//jwt();
 router.put("/:id",jwt(Role.Admin), update);
+
 router.delete("/:id", jwt(Role.Admin), _delete);
 
 

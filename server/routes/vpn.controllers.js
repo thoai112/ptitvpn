@@ -10,9 +10,9 @@ const Vpn = db.Vpn;
 //routes
 router.post("/addvpn", jwt(Role.Admin), addvpn);
 router.get("/getvpn/:id", getvpn);
-router.put("/putserver/:id",jwt(Role.Admin),putserver);
-router.put("/putnetwork/:id",jwt(Role.Admin),putnetwork);
-router.get("/decrypt/:id", decrypt);
+router.get("/getall", getAll);
+router.put("/update",jwt(Role.Admin),updatever);
+router.get("/decrypt", decrypt);
 
 
 module.exports = router;
@@ -37,25 +37,47 @@ function addvpn(req, res, next) {
         res.json(vpn)
       );
   }
-    
-  function putserver(req, res) {
-    Vpn.findOneAndUpdate({_id: req.params.id},{$push:{Servers:req.body.serverId}},{new:true},(error,doc)=>{
-      if(error) throw(err);
-      else res.json(doc);
-    })
-  }
 
-  function putnetwork(req, res) {
-    Vpn.findOneAndUpdate({_id: req.params.id},{$push:{Networks:req.body.networkId}},{new:true},(error,doc)=>{
-      if(error) throw(err);
-      else res.json(doc);
-    })
-  }
-
- 
-  function decrypt(req, res, next) {
+  function getAll(req, res, next) {
     vpnServices
-      .callMyPromise(req.params.id)
+      .getAll()
+      .then((vpn) =>
+        res.json(vpn)
+      );
+  }
+
+  function isNewerVersion (oldVer, newVer) {
+    const oldParts = oldVer.split('.')
+    const newParts = newVer.split('.')
+    for (var i = 0; i < newParts.length; i++) {
+      const a = ~~newParts[i] 
+      const b = ~~oldParts[i] 
+      if (a > b) return true
+      if (a < b) return false
+    }
+    return false
+  }
+
+async function updatever(req, res) {
+    const ver = await Vpn.findOne({ Name: "FREE"});
+    if(isNewerVersion(ver.Version,req.body.version)===true)
+    {
+      Vpn.findOneAndUpdate(ver.id,{$set:{Version :req.body.version}},{new:true},(error,doc)=>{
+        if(error) throw(err);
+        else res.json(doc);
+      })
+    }
+    else
+    {
+      res.send("New version is define!");
+    }
+    
+  }
+ 
+  async function decrypt(req, res, next) {
+    const id = await Vpn.findOne(  {Name: "FREE"});
+    vpnServices
+      .callMyPromise(id.id)
       .then(function(result) {
         res.json(result);
       });

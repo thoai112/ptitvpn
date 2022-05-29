@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
-  // serverid :{ type: String, unique: true, required: true },
   Name: { type: String, unique: true,required: true },
   FLAG: { type: String, required: true },
   ServerIP: { type: String, required: true },

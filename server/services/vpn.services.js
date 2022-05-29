@@ -6,13 +6,16 @@ const aesServices = require("../services/aes.services");
       const newVpn = new Vpn(userParam);
       await newVpn.save();
     }
+  async function getAll() {
+    return await Vpn.find();
+  }
 
   async function getvpn(id) {
     return await Vpn.findById(id).populate("Servers Networks").lean();
   }
 
-  //const id = "626ec9e677c2d1235b91c35c";
   
+
   var myPromise = (id) => (
     new Promise((resolve, reject) => {
         
@@ -43,5 +46,6 @@ const aesServices = require("../services/aes.services");
 module.exports = {
   addvpn,
   getvpn,
+  getAll,
   callMyPromise,
 };

@@ -1,16 +1,27 @@
 const db = require("../database/db");
 const Server = db.Server;
+const Vpn = db.Vpn;
+
+// fetchId = name => {
+//   return Vpn.findOne({Name: name}).then(user => user._id);
+// }; 
+// const id = fetchId("FREE").then(id => {return console.log(id)})
 
 
 async function createserver(netParam) {
-
+    
+    const id = await Vpn.findOne({Name: "FREE"});
     //create network obj
-    const network = await Server.findOne({ Name: netParam.Name });
+    const server = await Server.findOne({ Name: netParam.Name });
     //validate
-    if (network) throw `This network already exists`;
-    const newNetwork = new Server(netParam);
-    await newNetwork.save();
+    if (server) throw `This server already exists`;
+    const newServer = new Server(netParam);
+    await newServer.save().then(svid => { 
+      Vpn.findOneAndUpdate(id.id,{$push:{Servers:svid.id}},{new:true},(error,doc)=>{
+      })
+    });
   }
+
 
 async function getAllServer() {
     return await Server.find();
@@ -44,5 +55,6 @@ module.exports = {
     getAllServer,
     update,
     _delete,
+   
 }
   

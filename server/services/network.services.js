@@ -3,12 +3,16 @@ const Network = db.Network;
 
 async function createNetwork(netParam) {
 
+    const id = await Vpn.findOne({Name: "FREE"});
     //create network obj
     const network = await Network.findOne({ Name: netParam.Name });
     //validate
     if (network) throw `This network already exists`;
     const newNetwork = new Network(netParam);
-    await newNetwork.save();
+    await newNetwork.save().then(nwid => { 
+      Vpn.findOneAndUpdate(id.id,{$push:{Servers:nwid.id}},{new:true},(error,doc)=>{
+      })
+    });
   }
 
 
